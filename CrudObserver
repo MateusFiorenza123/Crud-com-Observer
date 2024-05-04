@@ -1,0 +1,67 @@
+Claro, vou criar um exemplo de design pattern Observer com as classes Gerente e Estoque. O padrão Observer é usado quando há uma relação de um-para-muitos entre objetos, de modo que quando um objeto muda de estado, todos os seus dependentes são notificados e atualizados automaticamente. Aqui está uma implementação básica em Python:
+
+```python
+from abc import ABC, abstractmethod
+
+class Observer(ABC):
+    @abstractmethod
+    def update(self, subject):
+        pass
+
+class Subject(ABC):
+    def __init__(self):
+        self._observers = []
+
+    def attach(self, observer):
+        self._observers.append(observer)
+
+    def detach(self, observer):
+        self._observers.remove(observer)
+
+    def notify(self):
+        for observer in self._observers:
+            observer.update(self)
+
+class Gerente(Observer):
+    def __init__(self, nome):
+        self.nome = nome
+
+    def update(self, subject):
+        if isinstance(subject, Estoque):
+            if subject.produto.preco > 1000:
+                print(f"Gerente {self.nome}: Alerta! Produto {subject.produto.nome} com preço acima de R$1000.")
+
+class Produto:
+    def __init__(self, nome, preco):
+        self.nome = nome
+        self.preco = preco
+
+class Estoque(Subject):
+    def __init__(self):
+        super().__init__()
+        self.produto = None
+
+    def set_produto(self, produto):
+        self.produto = produto
+        self.notify()
+
+# Exemplo de uso
+estoque = Estoque()
+gerente1 = Gerente("João")
+gerente2 = Gerente("Maria")
+
+estoque.attach(gerente1)
+estoque.attach(gerente2)
+
+# Produto acima de R$1000
+produto1 = Produto("Notebook", 1500)
+estoque.set_produto(produto1)
+
+# Produto abaixo de R$1000
+produto2 = Produto("Smartphone", 800)
+estoque.set_produto(produto2)
+```
+
+Neste exemplo, temos as classes `Gerente` e `Estoque`. `Gerente` é um observador que monitora o estoque e é notificado sempre que um produto é adicionado ao estoque. Se o preço do produto for superior a R$1000, o gerente recebe um alerta.
+
+No exemplo de uso, primeiro adicionamos um produto (notebook) com preço acima de R$1000, e o gerente é alertado. Depois, adicionamos outro produto (smartphone) com preço abaixo de R$1000, e o gerente não recebe alerta.
